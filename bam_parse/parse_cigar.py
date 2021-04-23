@@ -77,7 +77,7 @@ def ParseCigar(bam):
                         
                         # mismatch inside this so-called Match pair
                         if a != r:
-                            positions.append(record.reference_name + "\t" + str(record.pos+genome_start))
+                            positions.append(record.reference_name + "\t" + str(record.pos+genome_start+1))
                             alt.append(str(a))
                             ref.append(str(r))
                             readid.append(record.query_name)
@@ -86,7 +86,7 @@ def ParseCigar(bam):
                 elif op == BAM_CINS:
                     read_start = read_end
                     read_end = read_start + op_len
-                    positions.append(record.reference_name + "\t" + str(record.pos+genome_start))
+                    positions.append(record.reference_name + "\t" + str(record.pos+genome_start+1))
                     alt.append(str(record.query_sequence[read_start:read_end]))
                     ref.append("-")
                     readid.append(record.query_name)
@@ -95,7 +95,7 @@ def ParseCigar(bam):
                 elif op == BAM_CDEL:
                     genome_start = genome_end
                     genome_end   = genome_start + op_len
-                    positions.append(record.reference_name + "\t" + str(record.pos+genome_start))
+                    positions.append(record.reference_name + "\t" + str(record.pos+genome_start+1))
                     alt.append("-")
                     ref.append(str(record.get_reference_sequence()[genome_start:genome_end]))
                     readid.append(record.query_name)

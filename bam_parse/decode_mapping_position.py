@@ -4,9 +4,11 @@
 # Reference:
 #   https://www.jb51.net/article/142486.htm
 # History:
-#   Aug 1 2019		add alignment length, start and end in read
-#   Sept 26 2019	add shell script to get bases between two splits of one read
+#   20190801, add alignment length, start and end in read
+#   20190926, add shell script to get bases between two splits of one read
+#   20210331, check if read is mapped
 
+import sys
 import argparse
 import pysam
 import matplotlib
@@ -20,8 +22,8 @@ def GetArgs():
     parser = argparse.ArgumentParser(description='Obtain mapping start and end position and draw a plot.')
     parser.add_argument('--bam', dest='bam', help='sample.bam', required=True) 
     parser.add_argument('--out', dest='out', help='out file prefix', required=True) 
-    parser.add_argument('--seq', dest='seq', help='print sequences, True or False, default [False]', default=False)
-    parser.add_argument('--plot', dest='plot', help='draw alignment position plot, True or False, default [False]', default=False)
+    parser.add_argument('--seq', dest='seq', help='choose to print sequences', default=False, action='store_true')
+    parser.add_argument('--plot', dest='plot', help='choose to draw alignment position plot', default=False, action='store_true')
     args = parser.parse_args()
     return args
 
@@ -37,10 +39,13 @@ def ParseBamFile(bam, out, seq):
             strand = "-"
         else:
             strand = "+"
-        if seq:
-            out_file.write(str(line.qname)+"\t"+str(line.query_alignment_start)+"\t"+str(line.query_alignment_end)+"\t"+str(line.query_alignment_length)+"\t"+str(line.reference_name)+"\t"+str(line.reference_start)+"\t"+str(line.reference_end)+"\t"+str(line.query_length)+"\t"+str(line.mapping_quality)+"\t"+strand+"\t"+str(line.query_sequence)+"\n") # modified Aug 1 2019
+        if line.is_unmapped: # added 20210331
+            continue
         else:
-            out_file.write(str(line.qname)+"\t"+str(line.query_alignment_start)+"\t"+str(line.query_alignment_end)+"\t"+str(line.query_alignment_length)+"\t"+str(line.reference_name)+"\t"+str(line.reference_start)+"\t"+str(line.reference_end)+"\t"+str(line.query_length)+"\t"+str(line.mapping_quality)+"\t"+strand+"\n") # modified Aug 1 2019
+            if seq:
+                out_file.write(str(line.qname)+"\t"+str(line.query_alignment_start+1)+"\t"+str(line.query_alignment_end)+"\t"+str(line.query_alignment_length)+"\t"+str(line.reference_name)+"\t"+str(line.reference_start+1)+"\t"+str(line.reference_end)+"\t"+str(line.query_length)+"\t"+str(line.mapping_quality)+"\t"+strand+"\t"+str(line.query_sequence)+"\n") # modified Aug 1 2019
+            else:
+                out_file.write(str(line.qname)+"\t"+str(line.query_alignment_start+1)+"\t"+str(line.query_alignment_end)+"\t"+str(line.query_alignment_length)+"\t"+str(line.reference_name)+"\t"+str(line.reference_start+1)+"\t"+str(line.reference_end)+"\t"+str(line.query_length)+"\t"+str(line.mapping_quality)+"\t"+strand+"\n") # modified Aug 1 2019
     bam_file.close()
     out_file.close()
     

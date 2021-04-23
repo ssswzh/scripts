@@ -1,5 +1,4 @@
-#!/usr/bin/env python3
-# Reference: https://codereview.stackexchange.com/questions/110079/find-all-distinct-palindromic-sub-strings-for-a-given-string
+#!/export/software/conda/miniconda3/bin/python
 
 # Usage: python2 find_all_palindrome.py file seq_column_number
 
@@ -40,3 +39,4 @@ for line in data_file:
     out_file.write(line.strip()+"\t"+str(all_palindromes(seq, pos))+"\n")
 data_file.close()
 out_file.close()
+

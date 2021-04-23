@@ -21,29 +21,11 @@ def VCFFormatConversion(vcffile, prefix):
     out = open(prefix+".plain", "w")
     records = []
     for line in vcf:
-        if not line.startswith("#"): 
+        if not line.startswith("#"):
             ele = line.strip().split("\t")
-            pos, ref, alt = ele[1], ele[3], ele[4]
-            if len(ref)==len(alt) and len(ref)>1 and ',' not in alt:# Separate adjacent SNP in one vcf record into single record.
-                for i in range(0,len(ref)):
-                    ele[3], ele[4] = ref[i], alt[i]
-                    if i!=0:
-                        ele[1] = str(int(pos) + i) # new position
-                        ele[7] = ele[7].replace(pos, ele[1]) # new information field
-                        item = '_'.join([ele[i] for i in (0,1,3,4)])
-                        out.write(item+"\n")
-                        records.append(item)
-            elif ',' in alt: # Separate multi alt result in one position
-                allele = alt.split(",")
-                for i in range(0,len(allele)):
-                    ele[4] = allele[i]
-                    item = '_'.join([ele[i] for i in (0,1,3,4)])
-                    out.write(item+"\n")
-                    records.append(item)
-            else:
-                item = '_'.join([ele[i] for i in (0,1,3,4)])
-                out.write(item+"\n")
-                records.append(item)
+            item = '_'.join([ele[i] for i in (0,1,3,4)])
+            out.write(item+"\n")
+            records.append(item)
     vcf.close()
     out.close()
     return records
