@@ -85,7 +85,10 @@ def GetSeqProbabilities(sequence, reference, ref_version, svtype, chrom, pos, en
         # probabilities and relative positions
         acceptor_prob, donor_prob, acceptor_pos, donor_pos = CalculateSeqProb(sequence)
         # output combined sequence, upper case for pseudoexon
-        newSeq = sequence[0:acceptor_pos].lower() + sequence[acceptor_pos:donor_pos+1].upper() + sequence[donor_pos+1:].lower()
+        if donor_pos > acceptor_pos:
+            newSeq = sequence[0:acceptor_pos].lower() + sequence[acceptor_pos:donor_pos+1].upper() + sequence[donor_pos+1:].lower()
+        else:
+            newSeq = "--"
         # use middle position to restore relative position
         mid_pos = len(sequence)/2
         # restore true coordinate

@@ -14,23 +14,17 @@ for line in fp:
     name = "_".join(query.split("_")[:-1]) # primer_id
     if name not in stat: stat[name] = {}
     if target not in stat[name]:  stat[name][target] = []
-    #stat[name][target].append(query) 
+    stat[name][target].append(query) 
   elif line.startswith("optimal_alignment_score"):
     score = line.strip().split("\t")[0].split(" ")[-1] 
-    #stat[name][target].append(score)
+    stat[name][target].append(score)
     for ele in line.strip().split("\t"):
       if ele.startswith("strand"):
-        strand = ele.split(" ")[-1]
-        #stat[name][target].append(ele.split(" ")[-1])
+        stat[name][target].append(ele.split(" ")[-1])
       if ele.startswith("target_begin"):
-        ts = ele.split(" ")[-1] #stat[name][target].append(ele.split(" ")[-1])
+        stat[name][target].append(ele.split(" ")[-1])
       if ele.startswith("target_end"):
-        te = ele.split(" ")[-1] #stat[name][target].append(ele.split(" ")[-1])
-      if ele.startswith("query_begin"):
-        qs = ele.split(" ")[-1]
-      if ele.startswith("query_end"):
-        qe = ele.split(" ")[-1]
-   stat[name][target] = [] 
+        stat[name][target].append(ele.split(" ")[-1])
   # stat[primer_id]={ref1: [p1, p1score, p1strand, p1start, p1end, p2, p2score, p2strand, p2start, p2end]}
   # stat[primer_id]={ref1: [ 0,    1   ,     2   ,    3   ,   4  , 5 ,    6   ,     7   ,    8   ,   9  ]}
       
