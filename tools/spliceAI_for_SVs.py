@@ -69,7 +69,7 @@ def GetSeqProbabilities(sequence, reference, ref_version, svtype, chrom, pos, en
     if ref_version == 'grch37':
         annotations = utils.__file__.replace("utils.py", "") + "annotations/grch37.txt"
     elif ref_version == 'grch38':
-        annotations = utils.__file__.replace("utils.py", "") + "annotations/grch37.txt"
+        annotations = utils.__file__.replace("utils.py", "") + "annotations/grch38.txt"
     # probabilities
     probs = []
     ann = utils.Annotator(reference, annotations)
