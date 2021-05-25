@@ -149,10 +149,12 @@ def main():
         logging.error('{}'.format(e))
         exit()
     header = vcf.header
-    header.add_line('##INFO=<ID=SpliceAI,Number=.,Type=String,Description="SpliceAIv1.3.1 variant '
-                    'annotation. These include acceptor probabilities (AProb), donor probabilities'
-                    ' (DProb), acceptor position (APos), donor position (DPos) and sequence (Seq). '
-                    'Format: SVTYPE|SYMBOL|STRAND|AProb|DProb|APos|DPos|Seq">')
+    header.filters.add('STRANDBIAS', number=None, type=None, description='STRANDBIAS')
+    header.info.add('SpliceAI', number=1, type='String', description='SpliceAIv1.3.1 variant annotation. These include acceptor probabilities (AProb), donor probabilities (DProb), acceptor position (APos), donor position (DPos) and sequence (Seq). Format: SVTYPE|SYMBOL|STRAND|AProb|DProb|APos|DPos|Seq.')
+    #header.add_line('##INFO=<ID=SpliceAI,Number=.,Type=String,Description="SpliceAIv1.3.1 variant '
+    #                'annotation. These include acceptor probabilities (AProb), donor probabilities'
+    #                ' (DProb), acceptor position (APos), donor position (DPos) and sequence (Seq). '
+    #                'Format: SVTYPE|SYMBOL|STRAND|AProb|DProb|APos|DPos|Seq">')
     try:
         output = pysam.VariantFile(args.output, mode='w', header=header)
     except (IOError, ValueError) as e:
