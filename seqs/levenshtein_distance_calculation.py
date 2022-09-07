@@ -15,21 +15,20 @@ seqs['NC_001526.4:7603-7900']
 SeqRecord(seq=Seq('ATGCATGGAGATACACCTACATTGCATGAATATATGTTAGATTTGCAACCAGAG...TAA'), id='NC_001526.4:7603-7900', name='NC_001526.4:7603-7900', description='NC_001526.4:7603-7900', dbxrefs=[])
 '''
 
-outratio = open(args.output + ".ratio", "w")
-outdist = open(args.output + ".distance", "w")
+out = open(args.output, "w")
 keys = list(seqs.keys())
-outratio.write("Ratio\t" + "\t".join(keys) + "\n")
-outdist.write("Distance\t" + "\t".join(keys) + "\n")
+out.write("Ratio|Distance\t" + "\t".join(keys) + "\n")
 for i in range(0,len(keys)):
-    ratios = []
-    distances = []
+    matrix = []
     for j in range(0,len(keys)):
-        ratios.append(str(Levenshtein.seqratio(str(seqs[keys[i]].seq), str(seqs[keys[j]].seq))))
-        distances.append(str(Levenshtein.distance(str(seqs[keys[i]].seq), str(seqs[keys[j]].seq))))
-    outratio.write(keys[i] + "\t" + "\t".join(ratios) + "\n")
-    outdist.write(keys[i] + "\t" + "\t".join(distances) + "\n")
-    #outratio.write(keys[i] + "\t"*i + "\t".join(ratios) + "\n")
-    #outdist.write(keys[i] + "\t"*i + "\t".join(distances) + "\n")
-outratio.close()
-outdist.close()
+        r = str(Levenshtein.seqratio(str(seqs[keys[i]].seq), str(seqs[keys[j]].seq)))
+        d = str(Levenshtein.distance(str(seqs[keys[i]].seq), str(seqs[keys[j]].seq)))
+        if j < i:
+            matrix.append(r)
+        if j == i:
+            matrix.append("1")
+        if j > i:
+            matrix.append(d)
+    out.write(keys[i] + "\t" + "\t".join(matrix) + "\n")
+out.close()
 
