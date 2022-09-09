@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2022/01/14
 # @Author  : zhangsiwen
-# @contact : zhang.siwen@puruijizhun.com
+# @contact : zhang.siwen
 # @LastModified: 2022/01/14
 # @ChangeLog
 #     20220114, first version, modified from hotspot_saturation.r

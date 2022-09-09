@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2021/12/29
 # @Author  : zhangsiwen
-# @contact : zhang.siwen@puruijizhun.com
+# @contact : zhang.siwen
 # @LastModified: 2022/09/07
 # @ChangeLog
 #     20211229, first version
