@@ -9,6 +9,7 @@
 #     20220105, finished first version
 #     20220111, add CompareMaf(), modified ProcessMaf(), --base, --mode, --site
 #     20220114, add AddColumnPercent(), RenameColumns()
+#     20220913, minor change in Main() and GetArgs()
 
 
 import os
@@ -23,10 +24,10 @@ def GetArgs():
     parser._action_groups.pop()
     required = parser.add_argument_group('Required arguments')
     required.add_argument('--maf', help='maf file\nif choose to only compare to baseline (--mode==Compare --base), specify summarized file XX.HotSites.tsv, otherwise specify regular maf file', action='store', dest='maf', required=True)
-    required.add_argument('--tumor', help='tumor type to be summarized, LUAD', action='store', dest='tumor', required=True)
+    required.add_argument('--tumor', help='tumor type to be summarized, LUAD \nMAF file should have a column named "DISEASE"', action='store', dest='tumor', required=True)
     required.add_argument('--out', help='output prefix', action='store', dest='out', required=True)
     optional = parser.add_argument_group('Optional arguments')
-    optional.add_argument('--info', help='sample barcode and disease subtype file\nif choose --mode==Summary or --mode==Both, specify info file', action='store', dest='info')
+    optional.add_argument('--info', help='sample barcode and disease subtype file\nif choose --mode==Summary or --mode==Both, specify info file \nColumns separated by TAB: "PATIENT_BARCODE	DISEASE	SUBTYPE"', action='store', dest='info')
     optional.add_argument('--by', help='summarize hotspot by "Tumor" or "Subtype"', choices=['Tumor','Subtype'], action='store', dest='by', default='subtype', required=False)
     optional.add_argument('--site', help='summarize hotspot by sites in column "SITE", do not specify if you do not have this column', choices=['ALL','Primary','Metastasis','Recurrence','Not_Applicable'], action='store', dest='site', default='ALL', required=False)
     optional.add_argument('--variant', help="Variant_Type type to be reported, separate by comma ',', use 'ALL' for NOT FILTER any type \ndefault 'ALL', choose from [ALL,DEL,INS,SNP,DNP,TNP,ONP]", choices=['ALL','DEL','INS','SNP','DNP','TNP','ONP'], action='store', dest='variant', default='ALL', required=False)
@@ -373,8 +374,9 @@ def main():
     # dependencies
     if (args.mode=='Compare' or args.mode=='Both') and args.base is None:
         sys.exit('If choose --mode==Compare or --mode==Both, please also specify --base file')
-    if args.by=='Tumor' and len(args.base.strip().split(','))!=1:
-        sys.exit('If choose --by==Tumor, please specify a single --base file')
+    if args.by=='Tumor' and args.base!='':
+        if len(args.base.strip().split(','))!=1:
+            sys.exit('If choose --by==Tumor, please specify a single --base file')
     if (args.mode=='Summary' or args.mode=='Both') and args.info is None:
         sys.exit('If choose --mode==Summary or --mode==Both, please specify --info file')
     # assign values
