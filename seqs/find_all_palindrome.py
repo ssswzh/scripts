@@ -77,7 +77,7 @@ def main():
     data_file = open(args.fasta)
     for line in data_file: # 20220907
         if line.startswith('>'):
-            chrom = line.strip('>').split(' ')[0]
+            chrom = line.strip().strip('>').split(' ')[0]
             continue
         seq = line.strip()
         results = all_palindromes(seq, args.cutoff, args.mode)

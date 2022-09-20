@@ -1,6 +1,26 @@
 library(data.table)
 library(reshape2)
+
+usage <- "
+  Usage:
+    Rscript --vanilla draw_wgs_depth_distribution.r samtools.depth.tsv fasta.bed output.name
+    
+  samtools.depth.tsv:
+    samtools depth sample.bam > samtools.depth.tsv
+  
+  fasta.bed (TAB-delimited):
+    chr1	1	141
+    chr2	1	304
+  
+"
+
 args <- commandArgs(TRUE)
+if (length(args)==0) {
+  stop(usage, call.=FALSE)
+} else if (args[1]=='-h'||args[1]=='--help') {
+  stop(usage, call.=FALSE)
+}
+
 depth <- args[1]
 chrom <- args[2]
 output <- args[3]

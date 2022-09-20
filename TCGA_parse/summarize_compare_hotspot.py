@@ -9,7 +9,7 @@
 #     20220105, finished first version
 #     20220111, add CompareMaf(), modified ProcessMaf(), --base, --mode, --site
 #     20220114, add AddColumnPercent(), RenameColumns()
-#     20220913, minor change in Main() and GetArgs()
+#     20220913, minor change in Main() and GetArgs(), change cols[] to summarize by ref and alt
 
 
 import os
@@ -32,7 +32,7 @@ def GetArgs():
     optional.add_argument('--site', help='summarize hotspot by sites in column "SITE", do not specify if you do not have this column', choices=['ALL','Primary','Metastasis','Recurrence','Not_Applicable'], action='store', dest='site', default='ALL', required=False)
     optional.add_argument('--variant', help="Variant_Type type to be reported, separate by comma ',', use 'ALL' for NOT FILTER any type \ndefault 'ALL', choose from [ALL,DEL,INS,SNP,DNP,TNP,ONP]", choices=['ALL','DEL','INS','SNP','DNP','TNP','ONP'], action='store', dest='variant', default='ALL', required=False)
     optional.add_argument('--func', help="Variant_Classification type to be reported, separate by comma ',', use 'ALL' for NOT FILTER any classification \ndefault 'Frame_Shift_Del,Frame_Shift_Ins,In_Frame_Del,In_Frame_Ins,Intron,Missense_Mutation,Nonsense_Mutation,Nonstop_Mutation,RNA,Silent,Splice_Site,Translation_Start_Site' \nchoose from [ALL,3'Flank,3'UTR,5'Flank,5'UTR,Frame_Shift_Del,Frame_Shift_Ins,In_Frame_Del,In_Frame_Ins,Intron,Missense_Mutation,Nonsense_Mutation,Nonstop_Mutation,RNA,Silent,Splice_Site,Translation_Start_Site]", choices=['ALL','3\'Flank','3\'UTR','5\'Flank','5\'UTR','Frame_Shift_Del','Frame_Shift_Ins','In_Frame_Del','In_Frame_Ins','Intron','Missense_Mutation','Nonsense_Mutation','Nonstop_Mutation','RNA','Silent','Splice_Site','Translation_Start_Site'], action='store', dest='func', default="Frame_Shift_Del,Frame_Shift_Ins,In_Frame_Del,In_Frame_Ins,Intron,Missense_Mutation,Nonsense_Mutation,Nonstop_Mutation,RNA,Silent,Splice_Site,Translation_Start_Site", required=False)
-    optional.add_argument('--base', help='mutation site baseline maf, if specified, compare input maf to baseline maf\nif --by==subtype, accept key:value pair for baseline maf of each subtype OR one baseline maf for comparing, separate key:value pair by comma ","\nFor types do not have baseline file, use "Other:XXX.tsv" for comparison.\nif --by==tumor, only accept one baseline maf file', action='store', dest='base', required=False)
+    optional.add_argument('--base', help='mutation site baseline maf, if specified, compare input maf to baseline maf\nif --by==subtype, accept key:value pair for baseline maf of each subtype OR one baseline maf for comparing, separate key:value pair by comma ","\nFor types do not have baseline file, use "Other:XXX.tsv" for comparison.\nif --by==tumor, only accept one baseline maf file', default=None, action='store', dest='base', required=False)
     optional.add_argument('--mode', help='Summary OR Compare OR Both', choices=['Summary','Compare','Both'], action='store', default='Summary', dest='mode', required=False)
     # usage examples
     usage = '''Usage:
@@ -153,19 +153,19 @@ def SummarizeMaf(submaf, out, command):
     @ submaf: maf in dataframe format
     '''
     # cols for extracting columns for site comparing
-    cols = ['Hugo_Symbol','Chromosome','Start_Position','End_Position','Variant_Classification','Variant_Type','Reference_Allele','HGVSc','HGVCp','Transcript','Existing_variation','RefSeq']
+    cols = ['Hugo_Symbol','Chromosome','Start_Position','End_Position','Reference_Allele','Tumor_Seq_Allele2','Variant_Classification','Variant_Type','HGVSc','HGVSp','Transcript','Existing_variation','RefSeq']
     #################
     # calculate sample number for each site
     #################
     #sites = submaf.pivot_table(columns=cols, aggfunc='size').sort_values(ascending=False)
-    sites = submaf.groupby(cols[0:6],as_index=False).size().rename(columns={'size':'Occurrence'}).sort_values(by='Occurrence', ascending=False).reset_index().drop('index', axis=1)
+    sites = submaf.groupby(cols[0:11],as_index=False).size().rename(columns={'size':'Occurrence'}).sort_values(by='Occurrence', ascending=False).reset_index().drop('index', axis=1)
     # how many samples each gene covered, used in output dataframe
     sites_sampleid = []
     sites_sampleid_numbers = []
     sites_sampleid_numbers_cumulate = []
     for s in sites.index:
         # extract sites by index and compare with submaf
-        s_sampleid = set(pd.merge(submaf, sites.iloc[[s]], on=cols[0:6], how='inner')['Tumor_Sample_Barcode'])
+        s_sampleid = set(pd.merge(submaf, sites.iloc[[s]], on=cols[0:11], how='inner')['Tumor_Sample_Barcode'])
         sites_sampleid.append(s_sampleid)
         sites_sampleid_numbers.append(len(s_sampleid))
         if sites_sampleid_numbers_cumulate == []:
@@ -231,7 +231,7 @@ def CompareMaf(maf, basefile, out, command):
     # read baseline file
     base = pd.read_table(basefile, low_memory=False, comment='#')
     # cols for extracting columns for site comparing
-    cols = ['Hugo_Symbol','Chromosome','Start_Position','End_Position','Variant_Classification','Variant_Type','Reference_Allele','HGVSc','HGVCp','Transcript','Existing_variation','RefSeq']
+    cols = ['Hugo_Symbol','Chromosome','Start_Position','End_Position','Reference_Allele','Tumor_Seq_Allele2','Variant_Classification','Variant_Type','HGVSc','HGVSp','Transcript','Existing_variation','RefSeq']
     # calculate cumulate sample percent for each site
     base = AddColumnPercent(base, max(base['Cumulate_Sample_Number']), 'Cumulate_Sample_Number', 'Cumulate_Sample_Number_Percent')
     maf = AddColumnPercent(maf, max(maf['Cumulate_Sample_Number']), 'Cumulate_Sample_Number', 'Cumulate_Sample_Number_Percent')
@@ -240,7 +240,7 @@ def CompareMaf(maf, basefile, out, command):
     maf.columns = RenameColumns(maf.columns, 'Dataset_')
     # merge baseline and maf, fill NaN by zero, delete dataset cumulate sample number and percent
     #mergedDf = base.merge(maf, on=cols[1:6], how='outer').sort_values(by=['Baseline_Occurrence','Dataset_Occurrence'], ascending=[False,False]).reset_index().drop('index', axis=1).fillna('')
-    mergedDf = base.merge(maf, on=cols[1:6], how='outer').fillna('')
+    mergedDf = base.merge(maf, on=cols[1:11], how='outer').fillna('')
     del mergedDf['Dataset_Cumulate_Sample_Number']
     del mergedDf['Dataset_Cumulate_Sample_Number_Percent']
     # re-count sample coverage for each site in merged dataframe
@@ -283,10 +283,11 @@ def ProcessMaf(maf, tumor, by, out, base, mode, command):
     @ invoked by main()
     '''
     # check how many baseline files are included
-    if len(base.strip().split(',')) == 1:
-        base = base.strip()
-    else: # convert to dict
-        base = {i.strip().split(':')[0].strip():i.strip().split(':')[1].strip() for i in base.strip().split(',')}
+    if base is not None:
+        if len(base.strip().split(',')) == 1:
+            base = base.strip()
+        else: # convert to dict
+            base = {i.strip().split(':')[0].strip():i.strip().split(':')[1].strip() for i in base.strip().split(',')}
     # summarize and compare by subtype
     if by == 'Subtype':
         # check if subtype applicable
@@ -374,8 +375,8 @@ def main():
     # dependencies
     if (args.mode=='Compare' or args.mode=='Both') and args.base is None:
         sys.exit('If choose --mode==Compare or --mode==Both, please also specify --base file')
-    if args.by=='Tumor' and args.base!='':
-        if len(args.base.strip().split(','))!=1:
+    if args.by=='Tumor' and args.base is not None:
+        if len(args.base.strip().split(',')) != 1:
             sys.exit('If choose --by==Tumor, please specify a single --base file')
     if (args.mode=='Summary' or args.mode=='Both') and args.info is None:
         sys.exit('If choose --mode==Summary or --mode==Both, please specify --info file')
