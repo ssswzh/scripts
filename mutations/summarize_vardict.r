@@ -3,7 +3,7 @@
 # @Author  : zhangsiwen
 # @ChangeLog
 #     20221018, first version
-#     20221024, change StatsByKey, add --mode, add fixed parameters
+#     20221024, change StatsByKey(), add GetKeyContent() and CountByKey(),  add --mode, add fixed parameters
 
 
 usage <- "
@@ -94,6 +94,42 @@ ReadVardict <- function ( file ) {
 
 
 
+# get key content from key name
+GetKeyContent <- function ( key ) {
+  if ( key == 'MutationType' ) {
+    key_types <- mutation_types
+  } else if ( key == 'ContextType' ) {
+    key_types <- context_types
+  } else if ( key == 'VAFRange' ) {
+    key_types <- vafrange_types
+  }
+  return(key_types)
+}
+
+
+
+# count number of key content
+CountByKey <- function (df, key='MutationType') {
+  
+  # count for mutation types
+  key_types <- GetKeyContent(key)
+  key_count <- data.frame(key_types)
+  tmp <- data.frame(table(df[,key]))
+  key_count <- merge(key_count, tmp, by.x = "key_types", by.y = "Var1", all.x=TRUE)
+  key_count[is.na(key_count )] <- 0
+  colnames(key_count) <- c(key, 'Count')
+  rownames(key_count) <- key_types
+  
+  # ratio and rank
+  total <- sum(key_count$Count)
+  key_count$Ratio <- paste0(round(100*key_count$Count/total,4), '%')
+  
+  return(key_count)
+  
+}
+
+
+
 # test strand bias
 StrandBiasSummary <- function ( df, key='MutationType' ) {
   
@@ -106,28 +142,17 @@ StrandBiasSummary <- function ( df, key='MutationType' ) {
   }
   
   # single key type
-  key_types <- sort(unique(df[,key]))
-  key_count <- data.frame(table(df[,key]))
-  colnames(key_count) <- c(key, 'Count')
-  rownames(key_count) <- key_count[,key]
+  key_count <- CountByKey(df, key=key) 
+  bias_count <- CountByKey(df[df$FisherTestStrandBias<=0.05,], key=key)
+  colnames(bias_count) <- c(key, 'BiasCount')
   
-  bias_table <- table(df[df$FisherTestStrandBias<=0.05, key])
-  total <- sum(key_count$Count)
+  bias_table <- merge(key_count[,-3], bias_count[,-3], by = key)
+  bias_table$BiasCountRatio <- paste0(round(100*bias_table$BiasCount/bias_table$Count,4), '%')
   
-  # for each type of key, fill ratio value
-  for ( k in key_count[,key] ) {
-    if ( is.na(bias_table[k]) ) {
-      key_count[key_count[,key]==k, 'BiasCount'] = 0
-      key_count[key_count[,key]==k, 'BiasCountRatio'] = '0%'
-    } else {
-      key_count[key_count[,key]==k, 'BiasCount'] = bias_table[k]
-      key_count[key_count[,key]==k, 'BiasCountRatio'] = paste0(round(100*bias_table[k]/key_count[key_count[,key]==k, 'Count'],4), '%')
-    }
-  }
+  key_total <- sum(bias_table$Count)
+  bias_table$BiasCountRatioInTotalCount <- paste0(round(100*bias_table$BiasCount/key_total,4), '%')
   
-  key_count$BiasCountRatioInTotal <- paste0(round(100*key_count$BiasCount/total,4), '%')
-  
-  return(key_count)
+  return(bias_table)
   
 }
 
@@ -188,26 +213,8 @@ DrawPlot <- function ( df, x, y ) {
 # summarize stats by specific key
 StatsByKey <- function ( df, key='MutationType', condition='NA' ) {
   
-  # get key types
-  if ( key == 'MutationType' ) {
-    key_types <- mutation_types
-  } else if ( key == 'ContextType' ) {
-    key_types <- context_types
-  } else if ( key == 'VAFRange' ) {
-    key_types <- vafrange_types
-  }
-  
   # count for mutation types
-  key_count <- data.frame(key_types)
-  tmp <- data.frame(table(df[,key]))
-  key_count <- merge(key_count, tmp, by.x = "key_types", by.y = "Var1", all.x=TRUE)
-  key_count[is.na(key_count )] <- 0
-  colnames(key_count) <- c(key, 'Count')
-  rownames(key_count) <- key_types
-  
-  # ratio and rank
-  total <- sum(key_count$Count)
-  key_count$Ratio <- paste0(round(100*key_count$Count/total,4), '%')
+  key_count <- CountByKey(df, key=key) 
 
   # quantiles
   key_stats <- SummarizeStats(df, key, 'AF')
