@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-if [ $1 == "-h" -o $1 == "--help" -o $1 == "" ]
+if [ $1 == "-h" -o $1 == "--help" -o $# == 0 ]
 then printf "\n
 Usage:
     sh $0 column_number times 'start'

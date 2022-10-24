@@ -11,8 +11,8 @@
 
 usage <- "
   Usage:
-    Rscript --vanilla boxplot_with_quantiles.r --in per_target_cov --out outprefix --dir ./ --key mean_coverage
-    Rscript --vanilla boxplot_with_quantiles.r --in per_target_cov --out outprefix --dir ./
+    Rscript --vanilla boxplot_with_quantiles.r --input per_target_cov --out outprefix --dir ./ --key mean_coverage
+    Rscript --vanilla boxplot_with_quantiles.r --input per_target_cov --out outprefix --dir ./
   
   For single per_target_cov file:
     must have keyword you specify by --key in first line, like output of Picard CollectTargetedPcrMetrics:
@@ -43,7 +43,7 @@ if (length(args)==0) {
 
 library(optparse, quietly=TRUE)
 library(ggplot2, quietly=TRUE)
-library(ggpubr, quietly=TRUE)
+#library(ggpubr, quietly=TRUE)
 theme_set(theme_classic())
 library(dplyr, quietly=TRUE)
 library(data.table, quietly=TRUE)
@@ -65,10 +65,10 @@ SummarizeStats <- function ( df, id, vars ) {
   
   mat <- melt(df, id.vars=id, measure.vars=vars)
   
-  mins <- mat %>% group_by(variable) %>% summarise_at(vars(value), list(name = min))
-  means <- mat %>% group_by(variable) %>% summarise_at(vars(value), list(name = mean))
-  medians <- mat %>% group_by(variable) %>% summarise_at(vars(value), list(name = median))
-  maxs <- mat %>% group_by(variable) %>% summarise_at(vars(value), list(name = max))
+  mins <- mat %>% group_by(variable) %>% summarise_at(vars(value), list(Min = min))
+  means <- mat %>% group_by(variable) %>% summarise_at(vars(value), list(Mean = mean))
+  medians <- mat %>% group_by(variable) %>% summarise_at(vars(value), list(Median = median))
+  maxs <- mat %>% group_by(variable) %>% summarise_at(vars(value), list(Max = max))
   stats <- data.frame(mins, medians, means, maxs)[,c(1,2,4,6,8)]
   colnames(stats) <- c('variable', 'Min', 'Median','Mean', 'Max')
   
@@ -94,9 +94,11 @@ DrawBoxplot <- function (df, stats, key, out, width=4, height=6) {
       geom_text(data = stats, aes(x = variable, y = Mean, label = paste('Mean:',Mean)), size = 4, color='black') + 
       geom_text(data = stats, aes(x = variable, y = Max, label = paste('Max:',Max)), size = 4, color='black') + 
       labs(x='Groups', y=key) + 
-      scale_color_brewer(palette="Set2") + scale_fill_brewer(palette="Set2") +
+      #scale_y_continuous(trans='log10') +
+      #scale_color_brewer(palette="Set2") + scale_fill_brewer(palette="Set2") +
       theme(axis.text=element_text(size=10), axis.title=element_text(size=10), 
             plot.title=element_text(size=15), plot.caption=element_text(size=10), 
+            #axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=0.5),
             legend.position="none")
   )
   dev.off()
@@ -141,7 +143,7 @@ Main <- function (inputfile, outdir='./', outfile, key=NULL) {
 
 # define arguments
 option_list = list(
-  make_option("--in", type="character", default=NULL, help="input file, details see usage", metavar="character"),
+  make_option("--input", type="character", default=NULL, help="input file, details see usage", metavar="character"),
   make_option("--out", type="character", default=NULL, help="output prefix", metavar="character"),
   make_option("--dir", type="character", default='./', help="output outdir, default current path", metavar="character"),
   make_option("--key", type="character", default=NULL, help="", metavar="character")
@@ -150,7 +152,7 @@ option_list = list(
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
 
-stats <- Main(opt$in, out$dir, out$out, out$key)
+stats <- Main(opt$input, opt$dir, opt$out, opt$key)
 # stats <- Main("LJ2103907BC01-7.per_target_cov", outdir='./', "LJ2103907BC01-7.per_target_cov", key='mean_coverage')
 # stats <- Main("../polishing/SAM001_kit/polishing/nct.all_sample.DP.tsv", outdir='./', "../polishing/SAM001_kit/polishing/nct.all_sample.DP")
 
