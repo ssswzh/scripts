@@ -8,7 +8,16 @@
 
 usage <- "
   Usage:
-    Rscript --vanilla summarize_vardict.r --input vardict_output [--out outprefix --dir ./ --mode tsv|xlsx|both
+    Rscript --vanilla summarize_vardict.r --input vardict_output [--out outprefix --dir ./ --mode tsv|xlsx|both]
+  
+  Arguments:
+    --input     vardict output
+    --out       output name without path, default is same as input name
+    --dir       output path, default is same as input file
+    --mode      output mode, default is 'both' 
+                    if choose 'both', both tsv and xlsx files will be generated,
+                    if choose 'tsv', 18 files will be generated,
+                    if choose 'xlsx', only 1 xlsx file will be generated.
     
   Vardict output:
     https://github.com/AstraZeneca-NGS/VarDictJava#output-columns
@@ -420,10 +429,7 @@ option_list = list(
   make_option("--input", type="character", default=NULL, help="vardict output", metavar="character"),
   make_option("--out", type="character", default=NULL, help="output file name (without path), default is input file name", metavar="character"),
   make_option("--dir", type="character", default=NULL, help="output directory name, default same as input file", metavar="character"),
-  make_option("--mode", type="character", default='both', help="output file format, 'tsv' OR 'xlsx' OR 'both', 'both' for default
-              if choose 'both', both tsv and xlsx files will be generated,
-              if choose 'tsv', 18 files will be generated,
-              if choose 'xlsx', only 1 xlsx file will be generated.", metavar="character")
+  make_option("--mode", type="character", default='both', help="output file format, 'tsv' OR 'xlsx' OR 'both'", metavar="character")
 );
 
 opt_parser = OptionParser(option_list=option_list)
