@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Created by Zhang Siwen & Zhang Manman, zhangsiwen@grandomics.com
+# Created by Zhang Siwen & Zhang Manman, zhangsiwen
 # History:
 #     20200811, manuscript
 #     20200812, add colors for stdout message
@@ -86,19 +86,19 @@ while true ; do
             printf -- "-o|--outdir      output path, default current folder \n";
             printf -- "-c|--ccs         ${bold}add to perform ccs step${NC}, if provide ccs.bam no need to add this argument \n";
             printf -- "-h|--help        print this help message\n";
-            printf -- "@Author: Siwen Zhang, zhangsiwen@grandomics.com, 20200811 \n\n";
+            printf -- "@Author: Siwen Zhang, zhangsiwen, 20200811 \n\n";
             exit 0;; #shift ; break; exit 1;;
         --) 
             shift ; break; exit 1;;
         ?)
             printf -- 'Usage: \n';
             printf -- 'sh ${shellname} -p platform -i input -b barcode.fa -r ref.fa -t target.bed -T thread -o outdir [--ccs] \n\n';
-            printf -- '@Author: Siwen Zhang, zhangsiwen@grandomics.com, 20200811 \n\n';
+            printf -- '@Author: Siwen Zhang, zhangsiwen, 20200811 \n\n';
             exit 0;; #shift ; break; exit 1;;
         *) 
             printf -- 'Usage: ';
             printf -- 'sh ${shellname} -p platform -i input -b barcode.fa -r ref.fa -t target.bed -T thread -o outdir [--ccs] \n\n'
-            printf -- '@Author: Siwen Zhang, zhangsiwen@grandomics.com, 20200811 \n\n';
+            printf -- '@Author: Siwen Zhang, zhangsiwen, 20200811 \n\n';
             exit 0;; #exit 1;;
     esac
 done

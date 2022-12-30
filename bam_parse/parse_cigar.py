@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # coding: utf-8
-# Author: zhangsiwen@grandomics.com, May 31 2019
+# Author: zhangsiwen, May 31 2019
 # Reference:
 #   https://github.com/bmvdgeijn/WASP/blob/master/mapping/snptable.py
 # History:

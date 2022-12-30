@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # coding: utf-8
-# Author:	jinhongshuai@grandomics.com
+# Author:	jinhongshuai
 # Date & Time:	2019-06-24
 
 import sys,re,os,pysam,gzip

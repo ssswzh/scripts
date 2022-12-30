@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # coding: utf-8
-# Author: zhangsiwen@grandomics.com
+# Author: zhangsiwen
 # History:
 #   Jan 7 2020, first version, to solve medaka_variant result combines two adjacent single position into one result, separate the result
 

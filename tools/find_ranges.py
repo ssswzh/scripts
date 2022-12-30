@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # coding: utf-8
-# Author: zhangsiwen@grandomics.com
+# Author: zhangsiwen
 # History:
 #   20200225, manuscript
 

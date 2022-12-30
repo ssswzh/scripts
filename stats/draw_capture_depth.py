@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # coding: utf-8
-# Author: zhangsiwen@grandomics.com, May 31 2019
+# Author: zhangsiwen, May 31 2019
 # History:
 #   July 22 2019, change a single region to a bed file and draw plot for each region
 #   Feb 7 2020, add a column for 4th-end column in bed file

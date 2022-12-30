@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # coding: utf-8
-# Author: zhangsiwen@grandomics.com, June 13 2019
+# Author: zhangsiwen, June 13 2019
 # Reference:
 #   https://www.jb51.net/article/142486.htm
 # History:

@@ -1,5 +1,5 @@
 // Original script written by Devon Ryan
-// Modified by zhangsiwen, zhangsiwen@grandomics.com
+// Modified by zhangsiwen, zhangsiwen
 // Logs:
 //      June 20 2019: change read ID header, add read name, mapping chr, soft-clip length, mapping coordinates, cigar value
 //      June 21 2019: added argument to choose output file format either FASTQ or FASTA

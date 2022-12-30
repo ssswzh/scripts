@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-# Created by Zhang Siwen, zhangsiwen@grandomics.com
+# Created by Zhang Siwen, zhangsiwen
 # History:
 #       20191210, create first version
 

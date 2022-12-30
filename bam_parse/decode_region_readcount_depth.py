@@ -1,6 +1,6 @@
 #!/export/software/conda/miniconda3/bin/python
 # coding: utf-8
-# Author: zhangsiwen@grandomics.com, Sept 5th 2019
+# Author: zhangsiwen, Sept 5th 2019
 # History:
 #   Sept 6th 2019, add bin segmentation function to avoid large HTML file
 
