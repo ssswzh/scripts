@@ -22,7 +22,7 @@ opt = parse_args(opt_parser)
 
 Main <- function ( gtf_file, out=NA, feature='exon' ) {
   if ( is.na(out) ) {
-    out <- gsub("gtf", paste(feature,"bed",sep='.'), gtf_file)
+    out <- gsub('gtf', paste(feature,'bed',sep='.'), gtf_file)
   } else {
     outdir <- dirname(out)
     if ( ! dir.exists(outdir) ) {
@@ -51,11 +51,13 @@ Main <- function ( gtf_file, out=NA, feature='exon' ) {
   }
   
   # output
-  colnames(df)[1] <- paste0("#",colnames(df)[1])
+  colnames(df)[1] <- paste0('#',colnames(df)[1])
   df$start <- df$start - 1 
   df <- format(df, scientific = FALSE)
-  write.table(df, file=out, quote=F, sep="\t", row.names=F, col.names=T)
-  
+  output.file <- file(out, "wb")
+  write.table(df, file=output.file, quote=F, sep='\t', row.names=F, col.names=T, eol='\n')
+  close(output.file)
+
 }
 
 
