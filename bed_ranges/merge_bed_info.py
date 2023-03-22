@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # coding: utf-8
 # author: zhang.siwen
+# data: 2023.03.15
 
 
 import sys
+import os
 import argparse
 from collections import OrderedDict
 
@@ -26,7 +28,18 @@ def GetArgs():
 def ReadBed(bedfile, field='4:-1'):
     # merge field
     if ':' in field:
-        field = [int(i) for i in field.strip().split(':')]
+        if '-' in field:
+            total_field = int(os.popen("tail -1 %s | awk -F'\t' '{print NF}'" % bedfile).readline().strip("\n"))
+            split_field = [int(i) for i in field.strip().split(':')]
+            field = []
+            for i in split_field:
+                if i > 0:
+                    field.append(i)
+                else:
+                    field.append(total_field+i+1)
+        else:
+            field = [int(i) for i in field.strip().split(':')]
+        field = list(range(field[0], field[1]+1))
     elif ',' in field:
         field = [int(i) for i in field.strip().split(',')]
     else:
@@ -34,17 +47,20 @@ def ReadBed(bedfile, field='4:-1'):
             field = int(field)
         except:
             sys.exit('Please give a single number OR numbers separated by "," OR a range with two numbers separated by ":".')
+    # header
+    header = os.popen("head -1 %s " % bedfile).readline().strip("\n")
+    # header
+    if header.startswith('#'):
+        header = header.strip().split('\t')
+        header = header[0:3] + ['length'] + [header[i-1] for i in field]
+    else:
+        header = None
     # read bed
     bed = open(bedfile)
     bed_content = OrderedDict()
     for line in bed:
-        # header
         if line.startswith('#'):
-            header = line.strip().split('\t')
-            header = header[0:3] + ['length'] + header[start:end]
             continue
-        else:
-            header = None
         # content
         element = line.strip().split('\t')
         mchr, mstart, mend = element[0:3]
@@ -70,9 +86,13 @@ def SummarizeBed(bed_content, outfile='out', header=None):
         del bed_content[key]['length']
         info_field = []
         for value in bed_content[key].values():
-            value = '|'.join(list(set(value)))
+            content = set(value)
+            if len(content) > 1:
+                value = '|'.join(list(value))
+            else:
+                value = '|'.join(list(content))
             info_field.append(value)
-        all_field = list(key.split(':')) + list(length) + info_field
+        all_field = list(key.split(':')) + [length] + info_field
         out.write('\t'.join(all_field) + '\n')
     out.close()
     return

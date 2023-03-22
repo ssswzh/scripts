@@ -8,6 +8,8 @@
 suppressMessages(library(optparse))
 suppressMessages(library(GenomicFeatures))
 suppressMessages(library(Repitools))
+suppressMessages(library(dplyr))
+suppressMessages(library(org.Hs.eg.db))
 
 
 option_list = list(
@@ -30,7 +32,7 @@ Main <- function ( gtf_file, out=NA, feature='exon' ) {
     }
   }
   
-  txdb <- makeTxDbFromGFF(gtf_file)
+  txdb <- makeTxDbFromGFF(gtf_file, organism='Homo sapiens', circ_seqs='MT')
   
   if ( feature == 'exon' ) {
     extraction <- tidyExons(txdb, drop.geneless=FALSE)
@@ -53,6 +55,7 @@ Main <- function ( gtf_file, out=NA, feature='exon' ) {
   # output
   colnames(df)[1] <- paste0('#',colnames(df)[1])
   df$start <- df$start - 1 
+  df <- df %>% mutate_if(is.character, trimws) # remove all whitespaces
   df <- format(df, scientific = FALSE)
   output.file <- file(out, "wb")
   write.table(df, file=output.file, quote=F, sep='\t', row.names=F, col.names=T, eol='\n')
