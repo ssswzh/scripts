@@ -1,17 +1,17 @@
-#!/usr/bin/bash
+#!/bin/bash
 
-if [ $1 == "-h" -o $1 == "--help" -o $# == 0 ]
+if [[ $# < 3 ]]
 then printf "\n
 Usage:
-    sh $0 column_number times 'start'
-    sh $0 column_number times 'pos'
+    bash $0 column_number times 'start'
+    bash $0 column_number times 'pos'
     
 if choose 'start':
-    sh $0 5 4 start
+    bash $0 5 4 start
     will give: 1,2,3,4,5,10,15,20
 
 if choose 'pos':
-    sh $0 5 4 pos
+    bash $0 5 4 pos
     will give: 5,10,15,20
 
 "

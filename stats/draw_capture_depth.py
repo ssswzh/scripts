@@ -28,17 +28,19 @@ def ReadBedRegion(bed): # function of reading bed file, added July 22 2019
     bed_region = []
     for line in bed:
         ele = line.strip().split("\t")
+        start = str(int(ele[1])+1) # start position add 1, 20230811
         if len(ele) > 3: # function of bed file column number, Feb 7 2020
             info = '_'.join(ele[3:])
-            bed_region.append(ele[0]+"#"+ele[1]+"#"+ele[2]+"#"+info)
+            bed_region.append(ele[0]+"#"+start+"#"+ele[2]+"#"+info)
         else:
-            bed_region.append(ele[0]+"#"+ele[1]+"#"+ele[2]+"#")
+            bed_region.append(ele[0]+"#"+start+"#"+ele[2]+"#")
         
     return bed_region
 
 def ReadAndProcess(indepth, bed_region, window_size, step, outfile):
     df = pd.read_table(indepth, sep="\t", header=None, low_memory=False)
     bed_region = bed_region
+    #print(bed_region)
     size = window_size
     step = step
     result=open(outfile, "w")
@@ -49,7 +51,10 @@ def ReadAndProcess(indepth, bed_region, window_size, step, outfile):
         start = int(region.split("#")[1])
         end = int(region.split("#")[2])
         info = str(region.split("#")[3])
+        #print(chrom, start, end)
+        #print(type(chrom), type(start), type(end))
         df.iloc[:,0] = df.iloc[:,0].astype(str) # mandatory type conversion to string, added Jan 3 2019
+        df.iloc[:,1] = df.iloc[:,1].astype(int)
         depth = df.loc[(df.iloc[:,0] == chrom) & (df.iloc[:,1] >= start) & (df.iloc[:,1] <= end)]
         # default dict value type to avoid error when use hash[key].append, added July 22 2019
         region_hash[region] = [] 

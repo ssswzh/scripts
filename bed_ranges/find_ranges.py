@@ -3,6 +3,7 @@
 # Author: zhangsiwen
 # History:
 #   20200225, manuscript
+#   20231020, --depth could be a bed file
 
 import argparse
 from operator import itemgetter
@@ -26,12 +27,19 @@ def ListToRange(alist):
     return ranges
 
 def FindRanges(infile, cutoff, outfile):
+    if infile.endswith('.bed'):
+        BED = True
+    else:
+        BED = False
     depth = open(infile)
     pos_keep = {}
     pos_lose = {}
     for line in depth:
         ele = line.strip().split("\t")
-        chrom, pos, dp = ele[0], int(ele[1]), int(ele[2])
+        if BED:
+            chrom, pos, dp = ele[0], int(ele[2]), int(ele[3])
+        else:
+            chrom, pos, dp = ele[0], int(ele[1]), int(ele[2])
         if dp >= int(cutoff):
             if chrom not in pos_keep.keys():
                 pos_keep[chrom] = []

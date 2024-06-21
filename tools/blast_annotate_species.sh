@@ -36,6 +36,6 @@ then
 fi
 if [ -f ${BLASTDB}/${db} ]
 then
-    printf "awk 'NR==FNR{if(\$1~/^>/){gsub(\">\",\"\",\$1)} a[\$1]=\$0} NR>FNR{if(a["\$2]){print \$0\"\\\t\"a[\$2]} else{print \$0\"\\\tNot found\"} }' ${BLASTDB}/${db}.species ${outfile}.blast.besthit > ${outfile}.blast.besthit.species \n\n"
+    printf "awk 'NR==FNR{if(\$1~/^>/){gsub(\">\",\"\",\$1)} a[\$1]=\$0} NR>FNR{if(a[\$2]){print \$0\"\\\t\"a[\$2]} else{print \$0\"\\\tNot found\"} }' ${BLASTDB}/${db}.species ${outfile}.blast.besthit > ${outfile}.blast.besthit.species \n\n"
     printf "cut -f13- ${outfile}.blast.besthit.species|sort|uniq -c|sort -k1,1nr|awk '{printf \$2\"\\\t\";for(i=3;i<=NF;i++){if(i==NF){print \$NF\"\\\t\"\$1}else{printf\$i\" \"}}}' > ${outfile}.blast.besthit.species.counts \n"
 fi
