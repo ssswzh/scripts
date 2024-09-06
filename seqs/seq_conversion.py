@@ -21,8 +21,8 @@ def get_args():
     parser.add_argument("-gc", required=False, action="store_true", 
                                 help="also get sequence GC to new column")
     usage = '''Usage:
-    %(prog)s --in seq.tsv --col 1 --mode [rev|com|rev_com]
-    %(prog)s --in GTTTAATTGAGTTGTCATATGTTAATAACGGTAT
+    %(prog)s -f seq.tsv -c 1 -m [rev|com|rev_com] -gc
+    %(prog)s -f GTTTAATTGAGTTGTCATATGTTAATAACGGTAT
     rev: reverse
     com: complement
     rev_com: reverse_complement

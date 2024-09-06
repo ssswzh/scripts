@@ -133,9 +133,9 @@ def calculate_stats_from_json(json_file, before_filtering=True):
     avg_length = (summary['read1_mean_length'] + summary.get('read2_mean_length', 0)) // 2
     total_reads = summary['total_reads']
     total_bases = summary['total_bases']
-    q20_percent = summary['q20_rate'] * 100
-    q30_percent = summary['q30_rate'] * 100
-    gc_percent = summary['gc_content'] * 100
+    q20_percent = round(summary['q20_rate'] * 100, 2)
+    q30_percent = round(summary['q30_rate'] * 100, 2)
+    gc_percent = round(summary['gc_content'] * 100, 2)
     n_ppm = None  # N(ppm) will be calculated separately from FASTQ files
     
     return avg_length, total_reads, total_bases, q20_percent, q30_percent, gc_percent, n_ppm
